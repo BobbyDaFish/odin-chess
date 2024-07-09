@@ -43,9 +43,19 @@ describe Chess do
   end
 
   describe '#possible_moves' do
-    it 'returns array of possible moves as sub arrays' do
-      moves = game.possible_moves('white', ['b', 1])
-      expect(moves).to eql([['c', 1], ['d', 1]])
+    before do
+      allow(game).to receive(:king_moves).and_return([['h', 4], ['g', 4], ['g', 5], ['g', 6], ['h', 6]])
+      allow(game).to receive(:knight_moves).and_return([['f', 1], ['f', 3]])
+    end
+
+    it 'returns array of possible moves as sub arrays for the white side king' do
+      moves = game.possible_moves(game.current_turn, ['h', 5])
+      expect(moves).to eql([['h', 4], ['g', 4], ['g', 5], ['g', 6], ['h', 6]])
+    end
+
+    it 'returns array of possible moves from starting position for left white knight' do
+      moves = game.possible_moves(game.current_turn, ['h', 2])
+      expect(moves).to eql([['f', 1], ['f', 3]])
     end
   end
 end

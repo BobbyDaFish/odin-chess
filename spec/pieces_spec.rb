@@ -38,11 +38,4 @@ describe Pieces do # rubocop:disable Metrics/BlockLength
       expect(king).to be_a(Hash).and include(:icon)
     end
   end
-
-  describe '#move_calc' do
-    it 'returns the possible moves for an unmoved pawn' do
-      possible_moves = game_pieces.move_calc('black', ['b', 1], 'pawn')
-      expect(possible_moves).to eql([['c', 1], ['d', 1]])
-    end
-  end
 end

@@ -17,7 +17,7 @@ class Pieces
 
   def create_pieces(player)
     rows = %w[a b] if player == 'black'
-    rows = %w[g h] if player == 'white'
+    rows = %w[h g] if player == 'white'
 
     pieces = {}
     pieces[:king] = create_king(player, rows)
