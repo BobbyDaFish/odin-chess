@@ -16,8 +16,8 @@ class Pieces
   end
 
   def create_pieces(player)
-    rows = %w[a b] if player == 'black'
-    rows = %w[h g] if player == 'white'
+    rows = [1, 2] if player == 'white'
+    rows = [8, 7] if player == 'black'
 
     pieces = {}
     pieces[:king] = create_king(player, rows)
@@ -33,7 +33,7 @@ class Pieces
     king[:icon] = "\u265a " if player == 'black'
     king[:icon] = "\u2654 " if player == 'white'
 
-    king[:position] = [rows[0], 5]
+    king[:position] = ['e', rows[0]]
     king
   end
 
@@ -42,7 +42,7 @@ class Pieces
     queen[:icon] = "\u265b " if player == 'black'
     queen[:icon] = "\u2655 " if player == 'white'
 
-    queen[:position] = [rows[0], 4]
+    queen[:position] = ['d', rows[0]]
     queen
   end
 
@@ -51,10 +51,10 @@ class Pieces
     pieces[:right_knight] = {}
     pieces[:left_knight][:icon] = "\u265e " if player == 'black'
     pieces[:left_knight][:icon] = "\u2658 " if player == 'white'
-    pieces[:left_knight][:position] = [rows[0], 2]
+    pieces[:left_knight][:position] = ['b', rows[0]]
     pieces[:right_knight][:icon] = "\u265e " if player == 'black'
     pieces[:right_knight][:icon] = "\u2658 " if player == 'white'
-    pieces[:right_knight][:position] = [rows[0], 7]
+    pieces[:right_knight][:position] = ['g', rows[0]]
     pieces
   end
 
@@ -63,10 +63,10 @@ class Pieces
     pieces[:right_rook] = {}
     pieces[:left_rook][:icon] = "\u265e " if player == 'black'
     pieces[:left_rook][:icon] = "\u2656 " if player == 'white'
-    pieces[:left_rook][:position] = [rows[0], 1]
+    pieces[:left_rook][:position] = ['a', rows[0]]
     pieces[:right_rook][:icon] = "\u265e " if player == 'black'
     pieces[:right_rook][:icon] = "\u2656 " if player == 'white'
-    pieces[:right_rook][:position] = [rows[0], 8]
+    pieces[:right_rook][:position] = ['h', rows[0]]
     pieces
   end
 
@@ -75,31 +75,31 @@ class Pieces
     pieces[:right_bishop] = {}
     pieces[:left_bishop][:icon] = "\u265d " if player == 'black'
     pieces[:left_bishop][:icon] = "\u2657 " if player == 'white'
-    pieces[:left_bishop][:position] = [rows[0], 3]
+    pieces[:left_bishop][:position] = ['c', rows[0]]
     pieces[:right_bishop][:icon] = "\u265d " if player == 'black'
     pieces[:right_bishop][:icon] = "\u2657 " if player == 'white'
-    pieces[:right_bishop][:position] = [rows[0], 6]
+    pieces[:right_bishop][:position] = ['f', rows[0]]
     pieces
   end
 
   def create_pawns(player, row, pieces) # rubocop:disable Metrics/AbcSize
-    pieces[:pawn1] = create_one_pawn(player, row, 1)
-    pieces[:pawn2] = create_one_pawn(player, row, 2)
-    pieces[:pawn3] = create_one_pawn(player, row, 3)
-    pieces[:pawn4] = create_one_pawn(player, row, 4)
-    pieces[:pawn5] = create_one_pawn(player, row, 5)
-    pieces[:pawn6] = create_one_pawn(player, row, 6)
-    pieces[:pawn7] = create_one_pawn(player, row, 7)
-    pieces[:pawn8] = create_one_pawn(player, row, 8)
+    pieces[:pawn1] = create_one_pawn(player, row, 'a')
+    pieces[:pawn2] = create_one_pawn(player, row, 'b')
+    pieces[:pawn3] = create_one_pawn(player, row, 'c')
+    pieces[:pawn4] = create_one_pawn(player, row, 'd')
+    pieces[:pawn5] = create_one_pawn(player, row, 'e')
+    pieces[:pawn6] = create_one_pawn(player, row, 'f')
+    pieces[:pawn7] = create_one_pawn(player, row, 'g')
+    pieces[:pawn8] = create_one_pawn(player, row, 'h')
     pieces
   end
 
-  def create_one_pawn(player, row, num)
+  def create_one_pawn(player, row, col)
     pawn = {}
     pawn[:icon] = "\u265f " if player == 'black'
     pawn[:icon] = "\u2659 " if player == 'white'
 
-    pawn[:position] = [row[1], num]
+    pawn[:position] = [col, row[1]]
     pawn
   end
 end

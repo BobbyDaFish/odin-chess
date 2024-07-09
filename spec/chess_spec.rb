@@ -44,18 +44,18 @@ describe Chess do
 
   describe '#possible_moves' do
     before do
-      allow(game).to receive(:king_moves).and_return([['h', 4], ['g', 4], ['g', 5], ['g', 6], ['h', 6]])
-      allow(game).to receive(:knight_moves).and_return([['f', 1], ['f', 3]])
+      allow(game).to receive(:king_moves).and_return([['d', 1], ['d', 2], ['e', 2], ['f', 2], ['f', 1]])
+      allow(game).to receive(:knight_moves).and_return([['a', 3], ['c', 3]])
     end
 
     it 'returns array of possible moves as sub arrays for the white side king' do
-      moves = game.possible_moves(game.current_turn, ['h', 5])
-      expect(moves).to eql([['h', 4], ['g', 4], ['g', 5], ['g', 6], ['h', 6]])
+      moves = game.possible_moves(game.current_turn, ['e', 1])
+      expect(moves).to eql([['d', 1], ['d', 2], ['e', 2], ['f', 2], ['f', 1]])
     end
 
     it 'returns array of possible moves from starting position for left white knight' do
-      moves = game.possible_moves(game.current_turn, ['h', 2])
-      expect(moves).to eql([['f', 1], ['f', 3]])
+      moves = game.possible_moves(game.current_turn, ['b', 1])
+      expect(moves).to eql([['a', 3], ['c', 3]])
     end
   end
 end
