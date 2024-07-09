@@ -9,7 +9,7 @@ require 'pry-byebug'
 # This is the pieces class that generates each piece object. It also hold methods for calculating possible
 # moves for each piece type. This shold be called after each move to generate new moves for that piece
 class Pieces
-  attr_accessor :pieces
+  attr_accessor :pieces, :icon
 
   def initialize(player)
     @pieces = create_pieces(player)
@@ -101,22 +101,5 @@ class Pieces
 
     pawn[:position] = [row[1], num]
     pawn
-  end
-
-  def move_calc(player, position, piece)
-    # calc_pawn(player, position) if piece == 'pawn'
-    # calc_knight(player, true_pos) if piece == 'knight'
-    # calc_bishop(player, true_pos) if piece == 'bishop'
-    # calc_rook(player, true_pos) if piece == 'rook'
-    # calc_queen(player, true_pos) if piece == 'queen'
-    # calc_king(player, true_pos) if piece == 'queen'
-  end
-
-  def calc_pawn(player, position)
-    row_to_num = { 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8 }
-    true_pos = [row_to_num[position[0]], position[1]]
-    moved = false
-    moved = true if true_pos[0] > 2 && player == 'white'
-    moved = true if true_pos[0] > 7 && player == 'black'
   end
 end
