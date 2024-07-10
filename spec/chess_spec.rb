@@ -2,7 +2,7 @@
 
 require '../lib/chess'
 
-describe Chess do
+describe Chess do # rubocop:disable Metrics/BlockLength
   subject(:game) { described_class.new }
 
   describe '#choose_piece' do
@@ -44,8 +44,8 @@ describe Chess do
 
   describe '#possible_moves' do
     before do
-      allow(game).to receive(:king_moves).and_return([['d', 1], ['d', 2], ['e', 2], ['f', 2], ['f', 1]])
-      allow(game).to receive(:knight_moves).and_return([['a', 3], ['c', 3]])
+      allow(game).to receive(:king_moves).and_return([[4, 1], [4, 2], [5, 2], [6, 2], [6, 1]])
+      allow(game).to receive(:knight_moves).and_return([[1, 3], [3, 3]])
     end
 
     it 'returns array of possible moves as sub arrays for the white side king' do
@@ -56,6 +56,67 @@ describe Chess do
     it 'returns array of possible moves from starting position for left white knight' do
       moves = game.possible_moves(game.current_turn, ['b', 1])
       expect(moves).to eql([['a', 3], ['c', 3]])
+    end
+  end
+
+  describe '#linear_moves' do
+    context 'starting game board, no pieces moved' do
+      before do
+        allow(game).to receive(:remove_invalid_moves).and_return([])
+        allow(game).to receive(:direction_move).and_return(nil)
+      end
+
+      it 'returns an empty array, as there are no possible moves' do
+        moves = game.possible_moves(game.current_turn, ['a', 1])
+        expect(moves).to eql([])
+      end
+    end
+  end
+
+  describe '#direction_move' do
+    context 'starting board with no moves' do
+      it 'receives a position and direction with no possible moves, so returns nil' do
+        result = game.direction_move([1, 1], [0, 1])
+        expect(result).to eql(nil)
+      end
+    end
+
+    context 'rook with a clear path forward to pawn at g1, but no other movement' do
+      before do
+        allow(game).to receive(:remove_invalid_moves).and_return([1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7])
+      end
+
+      it 'returns valid move options' do
+        result = game.direction_move([1, 1], [0, 1])
+        expect(result).to eql([[1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7]])
+      end
+    end
+  end
+
+  describe '#pawn_move' do
+    context 'starting board with no moves for white player' do
+      xit 'can move forward one or two spaces' do
+        moves = game.pawn_move([1, 2])
+        expect(moves).to eql([[1, 3], [1, 4]])
+      end
+    end
+
+    context 'starting board with no moves for black player' do
+      before do
+        game.current_turn = game.player1
+        game.next_turn = game.player2
+      end
+      xit 'delivers correct directions for black side player' do
+        moves = game.pawn_move([1, 7])
+        expect(moves).to eql([[1, 6], [1, 5]])
+      end
+    end
+
+    context ' white player, enemy piece is diagonal on either corner, and ahead' do
+      it 'returns diagonal one as only option' do
+        moves = game.pawn_move([2, 6])
+        expect(moves).to eql([[1, 7], [3, 7]])
+      end
     end
   end
 end

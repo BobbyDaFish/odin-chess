@@ -46,7 +46,7 @@ class Pieces
     queen
   end
 
-  def create_knights(player, rows, pieces)
+  def create_knights(player, rows, pieces) # rubocop:disable Metrics/AbcSize
     pieces[:left_knight] = {}
     pieces[:right_knight] = {}
     pieces[:left_knight][:icon] = "\u265e " if player == 'black'
@@ -58,7 +58,7 @@ class Pieces
     pieces
   end
 
-  def create_rooks(player, rows, pieces)
+  def create_rooks(player, rows, pieces) # rubocop:disable Metrics/AbcSize
     pieces[:left_rook] = {}
     pieces[:right_rook] = {}
     pieces[:left_rook][:icon] = "\u265e " if player == 'black'
@@ -70,7 +70,7 @@ class Pieces
     pieces
   end
 
-  def create_bishops(player, rows, pieces)
+  def create_bishops(player, rows, pieces) # rubocop:disable Metrics/AbcSize
     pieces[:left_bishop] = {}
     pieces[:right_bishop] = {}
     pieces[:left_bishop][:icon] = "\u265d " if player == 'black'

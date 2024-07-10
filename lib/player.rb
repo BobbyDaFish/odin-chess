@@ -9,7 +9,7 @@ class Player
   def initialize(player)
     @turns_taken = 0
     @last_piece_taken = [nil, 0]
-    @turn_history = {}
+    @turn_history = []
     @side = 'black' if player == 1
     @side = 'white' if player == 2
     @pieces = Pieces.new(@side)
