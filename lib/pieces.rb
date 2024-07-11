@@ -61,10 +61,10 @@ class Pieces
   def create_rooks(player, rows, pieces) # rubocop:disable Metrics/AbcSize
     pieces[:left_rook] = {}
     pieces[:right_rook] = {}
-    pieces[:left_rook][:icon] = "\u265e " if player == 'black'
+    pieces[:left_rook][:icon] = "\u265c " if player == 'black'
     pieces[:left_rook][:icon] = "\u2656 " if player == 'white'
     pieces[:left_rook][:position] = ['a', rows[0]]
-    pieces[:right_rook][:icon] = "\u265e " if player == 'black'
+    pieces[:right_rook][:icon] = "\u265c " if player == 'black'
     pieces[:right_rook][:icon] = "\u2656 " if player == 'white'
     pieces[:right_rook][:position] = ['h', rows[0]]
     pieces

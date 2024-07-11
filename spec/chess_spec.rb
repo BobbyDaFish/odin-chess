@@ -11,7 +11,7 @@ describe Chess do # rubocop:disable Metrics/BlockLength
     end
 
     it 'returns the move selection if valid' do
-      array = game.choose_piece({ position: ['a', 1] })
+      array = game.choose_piece
       expect(array).to eql(['a', 1])
     end
   end
@@ -95,8 +95,8 @@ describe Chess do # rubocop:disable Metrics/BlockLength
 
   describe '#pawn_move' do
     context 'starting board with no moves for white player' do
-      xit 'can move forward one or two spaces' do
-        moves = game.pawn_move([1, 2])
+      it 'can move forward one or two spaces' do
+        moves = game.pawn_moves([1, 2])
         expect(moves).to eql([[1, 3], [1, 4]])
       end
     end
@@ -106,15 +106,15 @@ describe Chess do # rubocop:disable Metrics/BlockLength
         game.current_turn = game.player1
         game.next_turn = game.player2
       end
-      xit 'delivers correct directions for black side player' do
-        moves = game.pawn_move([1, 7])
+      it 'delivers correct directions for black side player' do
+        moves = game.pawn_moves([1, 7])
         expect(moves).to eql([[1, 6], [1, 5]])
       end
     end
 
-    context ' white player, enemy piece is diagonal on either corner, and ahead' do
+    context 'white player, enemy piece is diagonal on either corner, and ahead' do
       it 'returns diagonal one as only option' do
-        moves = game.pawn_move([2, 6])
+        moves = game.pawn_moves([2, 6])
         expect(moves).to eql([[1, 7], [3, 7]])
       end
     end
