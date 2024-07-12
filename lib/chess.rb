@@ -109,11 +109,12 @@ class Chess
     directions.each do |direction|
       next if direction_move(piece_coords, direction).nil?
 
-      possible_moves << direction_move(piece_coords, direction)
+      single_direction_moves = direction_move(piece_coords, direction)
+      single_direction_moves.each { |arr| possible_moves << arr }
     end
-    return [] if possible_moves.all?(nil)
 
-    possible_moves[0]
+    possible_moves # this aint working right. We're getting some weird nested arrays and stuff.
+    # maybe time to rethink how linear moves are working, and refactor
   end
 
   def direction_move(piece_coords, direction, moves = []) # rubocop:disable Metrics/AbcSize
@@ -124,7 +125,7 @@ class Chess
 
     moves << valid_move.flatten
     @next_turn.pieces.pieces.select do |_k, h| # stop if opponent's piece
-      return moves if h[:position] == [@num_to_col[valid_move[0]], valid_move[1]]
+      return moves if h[:position] == [@num_to_col[valid_move[0][0]], valid_move[0][1]]
     end
     direction_move(coords, direction, moves)
   end
@@ -245,6 +246,3 @@ class Chess
     end
   end
 end
-
-game = Chess.new
-game.play_game

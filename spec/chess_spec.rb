@@ -71,6 +71,19 @@ describe Chess do # rubocop:disable Metrics/BlockLength
         expect(moves).to eql([])
       end
     end
+
+    context 'white left bishop at c1 has clear moves to b2, a3, d2, e3, f4, and takes a pawn at g5' do
+      before do
+        game.next_turn.pieces.pieces[:pawn7][:position] = ['g', 5]
+        game.player2.pieces.pieces[:pawn2][:position] = ['b', 4]
+        game.player2.pieces.pieces[:pawn4][:position] = ['d', 4]
+      end
+
+      it 'returns possible moves including taking pawn' do
+        result = game.linear_moves([3, 1], [[-1, 1], [1, 1], [1, -1], [-1, -1]])
+        expect(result).to eql([[2, 2], [1, 3], [4, 2], [5, 3], [6, 4], [7, 5]])
+      end
+    end
   end
 
   describe '#direction_move' do
@@ -81,9 +94,9 @@ describe Chess do # rubocop:disable Metrics/BlockLength
       end
     end
 
-    context 'rook with a clear path forward to pawn at g1, but no other movement' do
+    context 'rook with a clear path forward to pawn at a7, but no other movement' do
       before do
-        allow(game).to receive(:remove_invalid_moves).and_return([1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7])
+        allow(game).to receive(:remove_invalid_moves).and_return([[1, 2]], [[1, 3]], [[1, 4]], [[1, 5]], [[1, 6]], [[1, 7]]) # rubocop:disable Layout/LineLength
       end
 
       it 'returns valid move options' do
