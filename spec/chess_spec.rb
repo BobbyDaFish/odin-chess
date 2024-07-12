@@ -84,6 +84,19 @@ describe Chess do # rubocop:disable Metrics/BlockLength
         expect(result).to eql([[2, 2], [1, 3], [4, 2], [5, 3], [6, 4], [7, 5]])
       end
     end
+
+    context 'black queen at c3 threatens white king at e1' do
+      before do
+        game.next_turn.pieces.pieces[:queen][:position] = ['c', 3]
+        game.current_turn.pieces.pieces[:pawn4][:position] = ['d', 4]
+        game.swap_turn
+      end
+
+      it 'includes e1 as a possible move' do
+        moves = game.linear_moves([3, 3], [[-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0]])
+        expect(moves).to include([5, 1])
+      end
+    end
   end
 
   describe '#direction_move' do
@@ -129,6 +142,20 @@ describe Chess do # rubocop:disable Metrics/BlockLength
       it 'returns diagonal one as only option' do
         moves = game.pawn_moves([2, 6])
         expect(moves).to eql([[1, 7], [3, 7]])
+      end
+    end
+  end
+
+  describe '#find_check' do
+    context 'white king is threatened by black queen' do
+      before do
+        game.next_turn.pieces.pieces[:queen][:position] = ['c', 3]
+        game.current_turn.pieces.pieces[:pawn4][:position] = ['d', 4]
+      end
+
+      it 'returns true' do
+        check = game.find_check
+        expect(check).to be true
       end
     end
   end

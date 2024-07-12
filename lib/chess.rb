@@ -144,12 +144,15 @@ class Chess
   # checks for opponent pieces diagonal, and ahead of selected pawn. It adjusts possible directions of movement to match
   def pawn_opponent_check(piece_coords, dir) # rubocop:disable Metrics/AbcSize
     forward_piece = false
+    forward_dir = 1 if @current_turn.side == 'white'
+    forward_dir = -1 if @current_turn.side == 'black'
     @next_turn.pieces.pieces.select do |_k, h|
-      forward_piece = true if h[:position] == [@num_to_col[piece_coords[0]], piece_coords[1] + 1]
+      forward_piece = true if h[:position] == [@num_to_col[piece_coords[0]], piece_coords[1] + forward_dir]
       dir << [dir[0][0] + 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] + 1], piece_coords[1] + 1]
       dir << [dir[0][0] - 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] - 1], piece_coords[1] + 1]
     end
-    dir.delete([0, 1]) if forward_piece == true # removes forward direction option if there was a piece present
+    # removes forward direction option if there was a piece present
+    dir.delete([0, forward_dir]) if forward_piece == true
     # this is to prevent the diagonal options from breaking if the forward is removed too early.
     dir
   end
@@ -186,28 +189,38 @@ class Chess
 
   def find_check
     king = @current_turn.pieces.pieces[:king][:position]
-    @next_turn.pieces.pieces.each_value do |piece|
+    swap_turn
+    @current_turn.pieces.pieces.each_value do |piece|
       next if piece[:position].nil?
 
-      moves = possible_moves(@next_turn, piece[:position])
+      moves = possible_moves(@current_turn, piece[:position])
       next if moves.nil?
 
       moves.each do |threat|
+        swap_turn if threat == king
         return true if threat == king
       end
     end
+    swap_turn
     false
   end
 
   def find_mate
     @current_turn.pieces.pieces.select do |k, v|
+      next if v[:position].nil?
+
       current_pos = []
       current_pos << v[:position][0]
       current_pos << v[:position][1]
       possible_moves = possible_moves(@current_turn, v[:position])
       possible_moves.each do |move|
-        @current_turn.pieces.pieces[k][v][:position] = move
-        return false unless find_check
+        @current_turn.pieces.pieces[k][:position] = move
+        unless find_check
+          @current_turn.pieces.pieces[k][:position] = current_pos
+          return false
+        end
+
+        @current_turn.pieces.pieces[k][:position] = current_pos
       end
     end
     true
@@ -228,7 +241,9 @@ class Chess
     until game_over == true
       display_board
       mate = find_mate if find_check
-      game_over = true && next if mate
+      game_over = true if mate
+      next if mate
+
       piece = choose_piece
       move = choose_move(piece)
       next if move == false
@@ -246,3 +261,7 @@ class Chess
     end
   end
 end
+
+game = Chess.new
+game.play_game
+puts "Game over #{game.current_turn.side} wins!"
