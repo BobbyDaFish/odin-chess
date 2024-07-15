@@ -1,7 +1,5 @@
 # frozen-string-literal: true
 
-require 'pry-byebug'
-
 # piece reference:
 #   white: king: "\u2654" queen: "\u2655" knight: "\u2658" rook: "\u2656" bishop: "\u2657" pawn: "\u2659"
 #   black: king: "\u265a" queen: "\u265b" knight: "\u265e" rook: "\u265c" bishop: "\u265d" pawn "\u265f"

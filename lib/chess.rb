@@ -3,10 +3,11 @@
 require_relative 'pieces'
 require_relative 'player'
 require_relative 'moves'
+require 'pry-byebug'
 
-# main game class. holds methods for the board, and calls to pieces for creating and updating pieces
+# Hold methods for game logic like updating and displaying board, accepting player input for moves
+# and determining check/mate
 class Chess
-  attr_reader :player1, :player2
   attr_accessor :current_turn, :next_turn
 
   def initialize # rubocop:disable Metrics/MethodLength
@@ -35,17 +36,15 @@ class Chess
   end
 
   def choose_piece
-    valid_piece = false
-    piece = []
-    while valid_piece == false
+    loop do
+      piece = []
       puts "Select a #{@current_turn.side} piece!\nPick a column from A to H"
-      piece[0] = gets.chomp
+      piece << gets.chomp
       puts 'Choose a row from 1 to 8'
-      piece[1] = gets.chomp.to_i
-      @current_turn.pieces.pieces.select { |_k, v| (valid_piece = true) if piece == v[:position] }
-      puts 'Invalid selection!' if valid_piece == false
+      piece << gets.chomp.to_i
+      @current_turn.pieces.pieces.select { |_k, v| return piece if piece == v[:position] }
+      puts 'Invalid selection!'
     end
-    piece
   end
 
   def choose_move(piece_coords)
@@ -54,49 +53,57 @@ class Chess
     move[0] = gets.chomp
     puts 'Choose a row from 1 to 8'
     move[1] = gets.chomp.to_i
-    return move if @movement.possible_moves(@current_turn, piece_coords).any?(move)
+    return move if @movement.possible_moves(@current_turn, piece_coords, @next_turn).any?(move)
 
     puts 'Invalid move, select a piece and try again.'
     false
   end
 
-  # checks if current players pieces share position coordinates with next players piece.
-  # If so, set next player's piece position to nil to remove from board
-  def resolve_takes
-    @current_turn.pieces.pieces.each_value do |current_turn_piece|
-      @next_turn.pieces.pieces.each_value do |next_turn_piece|
-        taken_piece = next_turn_piece if current_turn_piece[:position] == next_turn_piece[:position]
-        next_turn_piece[:position] = nil if current_turn_piece[:position] == next_turn_piece[:position]
-        return taken_piece unless taken_piece.nil?
+  # sets the new piece coords, then calls method to find and resolve any piece takes
+  def process_move(piece, move)
+    @current_turn.pieces.pieces.each_value do |v|
+      if v[:position] == piece
+        v[:position] = move
+        return resolve_takes(v)
       end
     end
+  end
+
+  # checks if current players pieces share position coordinates with next players piece.
+  # If so, set next player's piece position to [] to remove from board
+  def resolve_takes(piece)
+    @next_turn.pieces.pieces.each_value do |opp_piece|
+      if piece[:position] == opp_piece[:position]
+        opp_piece[:position] = nil
+        return opp_piece
+      end
+    end
+    []
   end
 
   def update_board
     @board.each_key do |k|
       @board[k] = ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ']
     end
-    @current_turn.pieces.pieces.select do |_k, v|
+    update_board_row(@current_turn)
+    update_board_row(@next_turn)
+  end
+
+  def update_board_row(player)
+    player.pieces.pieces.select do |_k, v|
       next if v[:position].nil?
 
-      coords = [v[:position][1], (@col_to_num[v[:position][0]]) - 1]
-      @board[coords[0]][coords[1]] = (v[:icon]).to_s
-    end
-    @next_turn.pieces.pieces.select do |_k, v|
-      next if v[:position].nil?
-
-      coords = [v[:position][1], (@col_to_num[v[:position][0]]) - 1]
-      @board[coords[0]][coords[1]] = (v[:icon]).to_s
+      @board[v[:position][1]][(@col_to_num[v[:position][0]]) - 1] = (v[:icon]).to_s
     end
   end
 
-  def find_check
+  def find_check # rubocop:disable Metrics
     king = @current_turn.pieces.pieces[:king][:position]
     swap_turn
     @current_turn.pieces.pieces.each_value do |piece|
       next if piece[:position].nil?
 
-      moves = @movement.possible_moves(@current_turn, piece[:position])
+      moves = @movement.possible_moves(@current_turn, piece[:position], @next_turn)
       next if moves.nil?
 
       moves.each do |threat|
@@ -109,22 +116,23 @@ class Chess
   end
 
   def find_mate
-    @current_turn.pieces.pieces.select do |k, v|
+    @current_turn.pieces.pieces.each do |k, v|
       next if v[:position].nil?
 
-      current_pos = []
-      current_pos << v[:position][0]
-      current_pos << v[:position][1]
-      possible_moves = @movement.possible_moves(@current_turn, v[:position])
-      possible_moves.each do |move|
-        @current_turn.pieces.pieces[k][:position] = move
-        unless find_check
-          @current_turn.pieces.pieces[k][:position] = current_pos
-          return false
-        end
+      player_state = @current_turn.pieces.pieces[k][:position]
+      pos_moves = @movement.possible_moves(@current_turn, v[:position], @next_turn)
+      return false unless mate?(pos_moves, v, player_state)
+    end
+    true
+  end
 
-        @current_turn.pieces.pieces[k][:position] = current_pos
-      end
+  def mate?(pos_moves, piece, state)
+    pos_moves.each do |move|
+      taken_piece = process_move(piece[:position], move)
+      check = find_check
+      piece[:position] = state
+      taken_piece[:position] = move unless taken_piece.empty?
+      return false unless check
     end
     true
   end
@@ -139,26 +147,28 @@ class Chess
     end
   end
 
-  def play_game
-    game_over = false
-    until game_over == true
-      display_board
-      mate = find_mate if find_check
-      game_over = true if mate
-      next if mate
-
+  def play_move
+    loop do
       piece = choose_piece
       move = choose_move(piece)
       next if move == false
 
-      @current_turn.pieces.pieces.select { |_k, h| h[:position] = move if h[:position] == piece }
-      taken_piece = resolve_takes
-      if find_check
-        taken_piece[:position] = move
-        @current_turn.pieces.pieces.select { |_k, h| h[:position] = piece if h[:position] == move }
-        puts 'This move has you in check. Invalid move, try again.'
-        next
-      end
+      taken_piece = process_move(piece, move)
+      return unless find_check
+
+      taken_piece[:position] = move unless taken_piece.empty?
+      @current_turn.pieces.pieces.select { |_k, h| h[:position] = piece if h[:position] == move }
+      puts 'This move has you in check. Invalid move, try again.'
+    end
+  end
+
+  def play_game
+    loop do
+      display_board
+      mate = find_mate if find_check
+      return if mate
+
+      play_move
       update_board
       swap_turn
     end
@@ -167,4 +177,4 @@ end
 
 game = Chess.new
 game.play_game
-puts "Game over #{game.current_turn.side} wins!"
+puts "Game over #{game.next_turn.side} wins!"
