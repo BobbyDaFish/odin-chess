@@ -3,6 +3,7 @@
 require_relative 'pieces'
 require_relative 'player'
 require_relative 'moves'
+require_relative 'board'
 require 'pry-byebug'
 
 # Hold methods for game logic like updating and displaying board, accepting player input for moves
@@ -10,15 +11,7 @@ require 'pry-byebug'
 class Chess
   attr_accessor :current_turn, :next_turn
 
-  def initialize # rubocop:disable Metrics/MethodLength
-    @board = { 8 => ["\u265c ", "\u265e ", "\u265d ", "\u265b ", "\u265a ", "\u265d ", "\u265e ", "\u265c "],
-               7 => ["\u265f ", "\u265f ", "\u265f ", "\u265f ", "\u265f ", "\u265f ", "\u265f ", "\u265f "],
-               6 => ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
-               5 => ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
-               4 => ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
-               3 => ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
-               2 => ["\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 "],
-               1 => ["\u2656 ", "\u2658 ", "\u2657 ", "\u2655 ", "\u2654 ", "\u2657 ", "\u2658 ", "\u2656 "] }
+  def initialize
     @player1 = Player.new(1)
     @player2 = Player.new(2)
     @current_turn = @player2
@@ -26,13 +19,7 @@ class Chess
     @num_to_col = { 1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd', 5 => 'e', 6 => 'f', 7 => 'g', 8 => 'h' }
     @col_to_num = { 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8 }
     @movement = Moves.new
-  end
-
-  def display_board
-    puts '    A   |  B   |  C   |  D   |  E   |  F   |  G   |  H   '
-    @board.each do |k, v|
-      puts " #{k}: #{v.join('  |  ')}"
-    end
+    @game_board = Board.new
   end
 
   def choose_piece
@@ -50,9 +37,9 @@ class Chess
   def choose_move(piece_coords)
     move = []
     puts "Where are you moving?\nPick a column from A to H"
-    move[0] = gets.chomp
+    move << gets.chomp
     puts 'Choose a row from 1 to 8'
-    move[1] = gets.chomp.to_i
+    move << gets.chomp.to_i
     return move if @movement.possible_moves(@current_turn, piece_coords, @next_turn).any?(move)
 
     puts 'Invalid move, select a piece and try again.'
@@ -79,22 +66,6 @@ class Chess
       end
     end
     []
-  end
-
-  def update_board
-    @board.each_key do |k|
-      @board[k] = ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  ']
-    end
-    update_board_row(@current_turn)
-    update_board_row(@next_turn)
-  end
-
-  def update_board_row(player)
-    player.pieces.pieces.select do |_k, v|
-      next if v[:position].nil?
-
-      @board[v[:position][1]][(@col_to_num[v[:position][0]]) - 1] = (v[:icon]).to_s
-    end
   end
 
   def find_check # rubocop:disable Metrics
@@ -164,17 +135,13 @@ class Chess
 
   def play_game
     loop do
-      display_board
+      @game_board.display_board
       mate = find_mate if find_check
       return if mate
 
       play_move
-      update_board
+      @game_board.update_board(@current_turn, @next_turn)
       swap_turn
     end
   end
 end
-
-game = Chess.new
-game.play_game
-puts "Game over #{game.next_turn.side} wins!"
