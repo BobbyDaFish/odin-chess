@@ -13,15 +13,17 @@ class Moves
     rook_direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]
     bishop_direction = [[-1, 1], [1, 1], [1, -1], [-1, -1]]
     queen_direction = [[-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0]]
-    true_pos = [@col_to_num[piece_coords[0]], piece_coords[1]]
+    true_position = [@col_to_num[piece_coords[0]], piece_coords[1]]
     piece_type = (player.pieces.pieces.select { |_k, h| h[:position] == piece_coords }).flatten[1][:icon]
-    possible_moves = king_moves(true_pos) if ["\u2654 ", "\u265a "].include?(piece_type)
-    possible_moves = linear_moves(true_pos, queen_direction, next_player) if ["\u2655 ", "\u265b "].include?(piece_type)
-    possible_moves = knight_moves(true_pos) if ["\u2658 ", "\u265e "].include?(piece_type)
-    possible_moves = linear_moves(true_pos, bishop_direction, next_player) if ["\u2657 ",
-                                                                               "\u265d "].include?(piece_type)
-    possible_moves = linear_moves(true_pos, rook_direction, next_player) if ["\u2656 ", "\u265c "].include?(piece_type)
-    possible_moves = pawn_moves(true_pos, next_player) if ["\u2659 ", "\u265f "].include?(piece_type)
+    possible_moves = king_moves(true_position) if ["\u2654 ", "\u265a "].include?(piece_type)
+    possible_moves = linear_moves(true_position, queen_direction, next_player) if ["\u2655 ",
+                                                                                   "\u265b "].include?(piece_type)
+    possible_moves = knight_moves(true_position) if ["\u2658 ", "\u265e "].include?(piece_type)
+    possible_moves = linear_moves(true_position, bishop_direction, next_player) if ["\u2657 ",
+                                                                                    "\u265d "].include?(piece_type)
+    possible_moves = linear_moves(true_position, rook_direction, next_player) if ["\u2656 ",
+                                                                                  "\u265c "].include?(piece_type)
+    possible_moves = pawn_moves(true_position, next_player) if ["\u2659 ", "\u265f "].include?(piece_type)
     possible_moves.each { |move| move[0] = @num_to_col[move[0]] }
     possible_moves
   end
