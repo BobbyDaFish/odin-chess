@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+require 'json'
+
 # Holds the board, and board methods
 class Board
   def initialize
@@ -33,6 +35,47 @@ class Board
       next if v[:position].nil?
 
       @board[v[:position][1]][(@col_to_num[v[:position][0]]) - 1] = (v[:icon]).to_s
+    end
+  end
+
+  def save_game(player1, player2, current_turn)
+    state = { 'player1' => player1, 'player2' => player2, 'current_turn' => current_turn }
+    save_file = save_file_check
+
+    File.open(save_file, 'w') do |json|
+      json << state.to_s.gsub('=>', ': ')
+    end
+    puts 'Game saved!'
+  end
+
+  def save_file_check
+    File.write('../save_game.json', '') unless File.exist?('../save_game.json')
+    File.open('../save_game.json')
+  end
+
+  def load_save_file(player1, player2)
+    save_file = File.open('../save_game.json')
+    json = save_file.readline
+    state = JSON.parse(json, { symbolize_names: true })
+    puts "-----\n\nGame loaded!"
+    player1.pieces.pieces = state[:player1]
+    player2.pieces.pieces = state[:player2]
+    return player1 if state[:current_turn] == 'white' # game will #swap_turn to set turn variables
+
+    player2 if state[:current_turn] == 'black'
+  end
+
+  def load?(player1, player2)
+    return unless File.exist?('../save_game.json')
+
+    puts "Save game found. Do you want to load your game?\nStarting a new game will delete this save."
+    loop do
+      puts "Load game?\nY/N?"
+      load = gets.chomp
+      return load_save_file(player1, player2) if load.match?(/y/i)
+      return player1 if load.match?(/n/i)
+
+      puts 'Invalid entry.'
     end
   end
 end

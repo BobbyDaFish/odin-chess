@@ -70,7 +70,7 @@ class Chess
 
   def find_check # rubocop:disable Metrics
     king = @current_turn.pieces.pieces[:king][:position]
-    swap_turn
+    swap_turn(@current_turn)
     @current_turn.pieces.pieces.each_value do |piece|
       next if piece[:position].nil?
 
@@ -78,11 +78,11 @@ class Chess
       next if moves.nil?
 
       moves.each do |threat|
-        swap_turn if threat == king
+        swap_turn(@current_turn) if threat == king
         return true if threat == king
       end
     end
-    swap_turn
+    swap_turn(@current_turn)
     false
   end
 
@@ -108,8 +108,8 @@ class Chess
     true
   end
 
-  def swap_turn
-    if @current_turn == @player2
+  def swap_turn(player = @player2)
+    if player.side == 'white'
       @current_turn = @player1
       @next_turn = @player2
     else
@@ -134,6 +134,8 @@ class Chess
   end
 
   def play_game
+    swap_turn(@game_board.load?(@player1, @player2))
+    @game_board.save_game(@player1.pieces.pieces, @player2.pieces.pieces, @current_turn.side)
     loop do
       @game_board.display_board
       mate = find_mate if find_check
@@ -141,7 +143,7 @@ class Chess
 
       play_move
       @game_board.update_board(@current_turn, @next_turn)
-      swap_turn
+      swap_turn(@current_turn)
     end
   end
 end
