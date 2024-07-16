@@ -13,6 +13,8 @@ class Board
                3 => ['  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
                2 => ["\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 ", "\u2659 "],
                1 => ["\u2656 ", "\u2658 ", "\u2657 ", "\u2655 ", "\u2654 ", "\u2657 ", "\u2658 ", "\u2656 "] }
+    @num_to_col = { 1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd', 5 => 'e', 6 => 'f', 7 => 'g', 8 => 'h' }
+    @col_to_num = { 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8 }
   end
 
   def display_board
@@ -31,7 +33,7 @@ class Board
   end
 
   def update_board_row(player)
-    player.pieces.pieces.select do |_k, v|
+    player.pieces.pieces.each_value do |v|
       next if v[:position].nil?
 
       @board[v[:position][1]][(@col_to_num[v[:position][0]]) - 1] = (v[:icon]).to_s
@@ -39,11 +41,11 @@ class Board
   end
 
   def save_game(player1, player2, current_turn)
-    state = { 'player1' => player1, 'player2' => player2, 'current_turn' => current_turn }
+    state = { player1: player1, player2: player2, current_turn: current_turn }
     save_file = save_file_check
 
     File.open(save_file, 'w') do |json|
-      json << state.to_s.gsub('=>', ': ')
+      json << state.to_json
     end
     puts 'Game saved!'
   end
@@ -60,6 +62,7 @@ class Board
     puts "-----\n\nGame loaded!"
     player1.pieces.pieces = state[:player1]
     player2.pieces.pieces = state[:player2]
+    binding.pry
     return player1 if state[:current_turn] == 'white' # game will #swap_turn to set turn variables
 
     player2 if state[:current_turn] == 'black'

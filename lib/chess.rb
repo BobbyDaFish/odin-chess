@@ -16,8 +16,6 @@ class Chess
     @player2 = Player.new(2)
     @current_turn = @player2
     @next_turn = @player1
-    @num_to_col = { 1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd', 5 => 'e', 6 => 'f', 7 => 'g', 8 => 'h' }
-    @col_to_num = { 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6, 'g' => 7, 'h' => 8 }
     @movement = Moves.new
     @game_board = Board.new
   end
@@ -135,14 +133,14 @@ class Chess
 
   def play_game
     swap_turn(@game_board.load?(@player1, @player2))
-    @game_board.save_game(@player1.pieces.pieces, @player2.pieces.pieces, @current_turn.side)
     loop do
+      @game_board.update_board(@current_turn, @next_turn)
+      @game_board.save_game(@player1.pieces.pieces, @player2.pieces.pieces, @current_turn.side)
       @game_board.display_board
       mate = find_mate if find_check
       return if mate
 
       play_move
-      @game_board.update_board(@current_turn, @next_turn)
       swap_turn(@current_turn)
     end
   end
