@@ -93,12 +93,14 @@ class Moves
     forward_piece = false
     forward_dir = 1 if @player.side == 'white'
     forward_dir = -1 if @player.side == 'black'
-    next_player.pieces.pieces.select do |_k, h|
+    next_player.pieces.pieces.each_value do |h|
       next if h[:position].nil?
 
       forward_piece = true if h[:position] == [@num_to_col[piece_coords[0]], piece_coords[1] + forward_dir]
-      dir << [dir[0][0] + 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] + 1], piece_coords[1] + 1]
-      dir << [dir[0][0] - 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] - 1], piece_coords[1] + 1]
+      dir << [dir[0][0] + 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] + 1],
+                                                            piece_coords[1] + forward_dir]
+      dir << [dir[0][0] - 1, dir[0][1]] if h[:position] == [@num_to_col[piece_coords[0] - 1],
+                                                            piece_coords[1] + forward_dir]
     end
     dir.delete([0, forward_dir]) if forward_piece == true
     dir

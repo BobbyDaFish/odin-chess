@@ -4,7 +4,6 @@ require_relative 'pieces'
 require_relative 'player'
 require_relative 'moves'
 require_relative 'board'
-require 'pry-byebug'
 
 # Hold methods for game logic like updating and displaying board, accepting player input for moves
 # and determining check/mate

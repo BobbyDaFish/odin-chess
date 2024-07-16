@@ -62,7 +62,6 @@ class Board
     puts "-----\n\nGame loaded!"
     player1.pieces.pieces = state[:player1]
     player2.pieces.pieces = state[:player2]
-    binding.pry
     return player1 if state[:current_turn] == 'white' # game will #swap_turn to set turn variables
 
     player2 if state[:current_turn] == 'black'
