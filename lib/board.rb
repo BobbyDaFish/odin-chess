@@ -68,7 +68,7 @@ class Board
   end
 
   def load?(player1, player2)
-    return unless File.exist?('../save_game.json')
+    return player1 unless File.exist?('../save_game.json')
 
     puts "Save game found. Do you want to load your game?\nStarting a new game will delete this save."
     loop do
